@@ -29,6 +29,11 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 
 	GL2 gl = getGl2(drawable);
 
+	int width = drawable.getWidth();
+	int height = drawable.getHeight();
+
+	gl.glViewport(0, 0, width, height);
+
 	int[] framebuffers = new int[1];
 	gl.glGenFramebuffers(1, framebuffers, 0);
 	framebuffer = framebuffers[0];
@@ -45,8 +50,7 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 	gl.glBindRenderbuffer(GL2.GL_RENDERBUFFER, depthRenderbuffer);
 
 	gl.glRenderbufferStorage(GL2.GL_RENDERBUFFER, GL2.GL_DEPTH_COMPONENT,
-		Math.max(drawable.getWidth(), 1), Math.max(
-			drawable.getHeight(), 1));
+		Math.max(width, 1), Math.max(height, 1));
 
 	gl
 		.glFramebufferRenderbuffer(GL2.GL_FRAMEBUFFER,
@@ -80,9 +84,9 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 	gl.glDeleteFramebuffers(1, new int[] { framebuffer }, 0);
 
 	// in JOGL 2.0b11 if secondary context (used to render to framebuffer)
-	// destroyed when main context is current it leads to problem on next
-	// secondary context creation (it is created but some operations on that
-	// failed)
+	// destroyed when main context is current, it leads to problem on next
+	// operations
+	context.release();
 	context.destroy();
 
 	setContextCurrent(drawable, parentContext);

@@ -95,12 +95,10 @@ public class PbufferScenePostprocessor extends ScenePostprocessor {
 
     @Override
     protected void shutdownSceneRendering(GLAutoDrawable drawable) {
-	// sometimes error occurs in JOGL 2.0b11 on pbuffer creation when
+	// sometimes error occurs in JOGL 2.0b11 on next pbuffer creation when
 	// current context was not released explicitly before destroying pbuffer
-	GLContext context = GLContext.getCurrent();
-	if (context != null) {
-	    context.release();
-	}
+	GLContext context = drawable.getContext();
+	context.release();
 
 	if (renderToTexture) {
 	    pbuffer.releaseTexture();
@@ -108,9 +106,7 @@ public class PbufferScenePostprocessor extends ScenePostprocessor {
 
 	pbuffer.destroy();
 
-	if (context != null) {
-	    context.makeCurrent();
-	}
+	context.makeCurrent();
 
 	pbuffer.removeGLEventListener(getSceneRenderer());
 
