@@ -1,0 +1,5 @@
+uniform sampler2D${Rect} texture;
+
+void main() {
+	gl_FragColor = texture2D${Rect}(texture, vec2(gl_TexCoord[0]));
+}

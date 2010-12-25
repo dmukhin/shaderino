@@ -1,0 +1,6 @@
+- on Intel GMA 4500 when used FBO for postprocessors, image not resized sometimes (glViewport?)
+- HDR implementation not completed (in ScenePostprocessor when texture created)
+- didn't see GLPbuffer RTT work yet
+- on Radeon 2600XT process doesn't exit
+- implement error handling which doesn't cause process not exit
+ 

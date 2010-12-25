@@ -1,0 +1,11 @@
+uniform sampler2D${Rect} texture;
+uniform vec2 textureMaxCoord;
+uniform float rotationAngle;
+
+const float MAX_ZOOM_FACTOR = 2.9;
+
+void main() {
+	float zoom = 1. + (MAX_ZOOM_FACTOR - 1.) * abs(rotationAngle) / 180.;
+	vec2 textureCoordinates = ((vec2(gl_TexCoord[0]) / textureMaxCoord - 0.5) / zoom + 0.5) * textureMaxCoord;
+	gl_FragColor = texture2D${Rect}(texture, textureCoordinates);
+}
