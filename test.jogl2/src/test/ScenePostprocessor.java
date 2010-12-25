@@ -116,7 +116,7 @@ public abstract class ScenePostprocessor implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
 	renderSceneTexture(drawable);
-	
+
 	GL2 gl = getGl2(drawable);
 
 	gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
@@ -177,9 +177,9 @@ public abstract class ScenePostprocessor implements GLEventListener {
 	if (isCreateRenderedSceneTexture()) {
 	    renderedSceneTexture = createTexture(gl, renderedSceneTextureTarget);
 	    gl.glBindTexture(renderedSceneTextureTarget, renderedSceneTexture);
-	    // TODO: HDR support
-	    gl.glCopyTexImage2D(renderedSceneTextureTarget, 0, GL2.GL_RGBA, 0,
-		    0, width, height, 0);
+	    gl.glTexImage2D(renderedSceneTextureTarget, 0, 4, width, height, 0,
+		    GL2.GL_RGBA, hdr ? GL2.GL_FLOAT : GL2.GL_UNSIGNED_BYTE,
+		    null);
 	} else {
 	    renderedSceneTexture = null;
 	}
