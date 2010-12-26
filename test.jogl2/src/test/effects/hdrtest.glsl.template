@@ -1,0 +1,8 @@
+uniform vec2 windowPosition;
+uniform vec2 windowSize;
+
+void main() {
+	vec2 fragmentPosition = (vec2(gl_FragCoord) - windowPosition) / windowSize - 0.5;
+	float color = fragmentPosition.x  * fragmentPosition.y > 0. ? 10. : 0.;
+	gl_FragColor = vec4(color, color, color, 1.);
+}

@@ -1,0 +1,10 @@
+uniform sampler2D${Rect} sceneTexture;
+
+float detect(in float value) {
+	return value > 1. ? 1. : 0.;
+}
+
+void main() {
+	vec4 color = texture2D${Rect}(sceneTexture, vec2(gl_TexCoord[0]));
+	gl_FragColor = vec4(detect(color.r), detect(color.g), detect(color.b), color.a);
+}

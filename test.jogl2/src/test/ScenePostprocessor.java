@@ -177,9 +177,9 @@ public abstract class ScenePostprocessor implements GLEventListener {
 	if (isCreateRenderedSceneTexture()) {
 	    renderedSceneTexture = createTexture(gl, renderedSceneTextureTarget);
 	    gl.glBindTexture(renderedSceneTextureTarget, renderedSceneTexture);
-	    gl.glTexImage2D(renderedSceneTextureTarget, 0, 4, width, height, 0,
-		    GL2.GL_RGBA, hdr ? GL2.GL_FLOAT : GL2.GL_UNSIGNED_BYTE,
-		    null);
+	    gl.glTexImage2D(renderedSceneTextureTarget, 0, hdr ? GL2.GL_RGBA16F
+		    : GL2.GL_RGBA, width, height, 0, GL2.GL_RGBA,
+		    hdr ? GL2.GL_FLOAT : GL2.GL_UNSIGNED_BYTE, null);
 	} else {
 	    renderedSceneTexture = null;
 	}
