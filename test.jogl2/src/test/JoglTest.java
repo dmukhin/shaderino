@@ -29,7 +29,7 @@ public class JoglTest {
 
     private String[] postprocessors = {};
 
-    private boolean fbo;
+    private boolean pbuffer;
 
     private boolean textureRectangle = true;
 
@@ -77,10 +77,11 @@ public class JoglTest {
 		    image = value;
 		} else if (optionLowCase.matches("(p|pp|((post)?processors))")) {
 		    postprocessors = value.split(",");
-		} else if (optionLowCase.matches("fbo")) {
-		    fbo = true;
+		} else if (optionLowCase.matches("pbuffer")) {
+		    pbuffer = true;
 		} else if (optionLowCase
 			.matches("pbuffer-(rtt|render\\-to\\-texture)")) {
+		    pbuffer = true;
 		    pbufferRenderToTexture = true;
 		} else if (optionLowCase.matches("hdr|high\\-dynamic\\-range")) {
 		    hdr = true;
@@ -168,14 +169,14 @@ public class JoglTest {
 
     private ScenePostprocessor createScenePostprocessor(
 	    String postprocessorName, GLEventListener actualRenderer) {
-	ScenePostprocessor scenePostprocessor = fbo ? new FboScenePostprocessor()
-		: new PbufferScenePostprocessor();
+	ScenePostprocessor scenePostprocessor = pbuffer ? new PbufferScenePostprocessor()
+		: new FboScenePostprocessor();
 	scenePostprocessor.setSceneRenderer(actualRenderer);
 	scenePostprocessor.setPostprocessor(postprocessorName);
 	scenePostprocessor.setDebugGl(debugGl);
 	scenePostprocessor.setTextureRectangle(textureRectangle);
 	scenePostprocessor.setHdr(hdr);
-	if (!fbo) {
+	if (pbuffer) {
 	    ((PbufferScenePostprocessor) scenePostprocessor)
 		    .setRenderToTexture(pbufferRenderToTexture);
 	}

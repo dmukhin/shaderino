@@ -7,7 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.JoglTest"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-d -p:grayscale -fbo"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-d -hdr -e:hdrtest -p:hdrtest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="test.jogl2"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="&quot;-Djava.library.path=${resource_loc:/test.jogl2/jogl/lib}&quot;"/>
 </launchConfiguration>
