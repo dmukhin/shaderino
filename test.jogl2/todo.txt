@@ -1,6 +1,6 @@
-- corruption (postprocessing uses FBO) when resized on secondary screen in multi-display configuration (Intel GMA 4500 only?)
-- didn't see GLPbuffer RTT work yet
 - on Radeon 2600XT process doesn't exit
+- didn't see GLPbuffer RTT work yet
+- check again the problem with corruption (using FBO postprocessing): appeared on Intel GMA 4500, multi-monitor configuration, usually on secondary display; fixed by unbinding framebuffer, but it seems normally not required action 
 - dig more about problems appears after context destruction when shared context is current (workaround works but need to discover)
 - implement error handling which doesn't cause process not exit
  

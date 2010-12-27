@@ -18,7 +18,7 @@ import javax.media.opengl.GLAutoDrawable;
 public abstract class GlUtils {
     public static GL2 useDebugGl(GLAutoDrawable drawable, boolean debugGl) {
 	GL2 gl = getGl2(drawable);
-	if (debugGl) {
+	if (debugGl && !(gl instanceof DebugGL2)) {
 	    gl = new DebugGL2(gl);
 	    drawable.setGL(gl);
 	}

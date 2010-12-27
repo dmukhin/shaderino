@@ -140,6 +140,10 @@ public abstract class ScenePostprocessor implements GLEventListener {
 	gl.glDeleteProgram(postprocessorProgram);
     }
 
+    protected boolean isDebugGl() {
+	return debugGl;
+    }
+
     protected GLEventListener getSceneRenderer() {
 	return sceneRenderer;
     }
