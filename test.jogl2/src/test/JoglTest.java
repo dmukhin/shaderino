@@ -192,9 +192,9 @@ public class JoglTest {
     }
 
     private void resizeView() {
-	Dimension windowPreferredSize = windowClientArea.getSize();
-	double windowWidth = windowPreferredSize.getWidth();
-	double windowHeight = windowPreferredSize.getHeight();
+	Dimension windowClientAreaSize = windowClientArea.getSize();
+	double windowWidth = windowClientAreaSize.getWidth();
+	double windowHeight = windowClientAreaSize.getHeight();
 	int viewSide = (int) Math.min(windowWidth, windowHeight);
 	view.setBounds((int) (windowWidth - viewSide) / 2,
 		(int) (windowHeight - viewSide) / 2, viewSide, viewSide);
