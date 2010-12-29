@@ -1,6 +1,7 @@
 package test;
 
 import static test.GlUtils.getGl2;
+import static test.GlUtils.useDebugGl;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -25,9 +26,7 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 
 	setContextCurrent(drawable);
 
-	getSceneRenderer().init(drawable);
-
-	GL2 gl = getGl2(drawable);
+	GL2 gl = useDebugGl(drawable, isDebugGl());
 
 	int width = drawable.getWidth();
 	int height = drawable.getHeight();
@@ -38,7 +37,7 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 	gl.glGenFramebuffers(1, framebuffers, 0);
 	framebuffer = framebuffers[0];
 
-	gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, framebuffer);
+	bindFramebuffer(drawable);
 
 	gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0,
 		getRenderedSceneTextureTarget(), getRenderedSceneTexture(), 0);
@@ -57,6 +56,9 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 			GL2.GL_DEPTH_ATTACHMENT, GL2.GL_RENDERBUFFER,
 			depthRenderbuffer);
 
+	getSceneRenderer().init(drawable);
+
+	unbindFramebuffer(drawable);
 	setContextCurrent(drawable, parentContext);
 
 	return null;
@@ -65,17 +67,22 @@ public class FboScenePostprocessor extends ScenePostprocessor {
     @Override
     protected void renderSceneTexture(GLAutoDrawable drawable) {
 	GLContext parentContext = setContextCurrent(drawable);
+	bindFramebuffer(drawable);
 
 	getSceneRenderer().display(drawable);
 
+	unbindFramebuffer(drawable);
 	setContextCurrent(drawable, parentContext);
     }
 
     @Override
     protected void shutdownSceneRendering(GLAutoDrawable drawable) {
 	GLContext parentContext = setContextCurrent(drawable);
+	bindFramebuffer(drawable);
 
 	getSceneRenderer().dispose(drawable);
+
+	unbindFramebuffer(drawable);
 
 	GL2 gl = getGl2(drawable);
 
@@ -106,5 +113,16 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 	context.makeCurrent();
 
 	return currentContext;
+    }
+
+    private void bindFramebuffer(GLAutoDrawable drawable) {
+	getGl2(drawable).glBindFramebuffer(GL2.GL_FRAMEBUFFER, framebuffer);
+    }
+
+    // if framebuffer is not unbound in renderSceneTexture after scene processed
+    // scene rendered, it leads to corruption (appeared on Intel GMA 4500 with
+    // multi-monitor configuration, usually on secondary monitor)
+    private void unbindFramebuffer(GLAutoDrawable drawable) {
+	getGl2(drawable).glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
     }
 }

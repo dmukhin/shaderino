@@ -9,6 +9,7 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLPbuffer;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLRunnable;
 
 public class PbufferScenePostprocessor extends ScenePostprocessor {
@@ -27,25 +28,25 @@ public class PbufferScenePostprocessor extends ScenePostprocessor {
 
     @Override
     protected Integer initSceneRendering(GLAutoDrawable drawable) {
-	GLCapabilities capabilities = (GLCapabilities) drawable
-		.getChosenGLCapabilities().cloneMutable();
+	GLProfile profile = drawable.getGLProfile();
+
+	GLCapabilities capabilities = new GLCapabilities(profile);
 
 	capabilities.setPbufferFloatingPointBuffers(isHdr());
 	capabilities.setPbufferRenderToTexture(renderToTexture);
 	capabilities.setPbufferRenderToTextureRectangle(renderToTexture
 		&& isTextureRectangle());
 
-	if (isHdr()) {
-	    capabilities.setRedBits(16);
-	    capabilities.setGreenBits(16);
-	    capabilities.setBlueBits(16);
-	}
+	int bits = isHdr() ? 16 : 8;
+	capabilities.setRedBits(bits);
+	capabilities.setGreenBits(bits);
+	capabilities.setBlueBits(bits);
+	
+	capabilities.setAlphaBits(8);
 
-	pbuffer = GLDrawableFactory.getFactory(drawable.getGLProfile())
-		.createGLPbuffer(null, capabilities, null,
-			Math.max(drawable.getWidth(), 1),
-			Math.max(drawable.getHeight(), 1),
-			drawable.getContext());
+	pbuffer = GLDrawableFactory.getFactory(profile).createGLPbuffer(null,
+		capabilities, null, Math.max(drawable.getWidth(), 1),
+		Math.max(drawable.getHeight(), 1), drawable.getContext());
 
 	pbuffer.addGLEventListener(getSceneRenderer());
 
