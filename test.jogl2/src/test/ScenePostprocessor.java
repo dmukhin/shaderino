@@ -10,6 +10,7 @@ import static test.GlUtils.useDebugGl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -35,6 +36,8 @@ public abstract class ScenePostprocessor implements GLEventListener {
 
     private String postprocessor;
 
+    private Properties postprocessorParameters = new Properties();
+
     private Integer sceneTextureUniformLocation;
 
     private Integer sceneTextureSizeUniformLocation;
@@ -59,6 +62,10 @@ public abstract class ScenePostprocessor implements GLEventListener {
 
     public void setPostprocessor(String postprocessor) {
 	this.postprocessor = postprocessor;
+    }
+
+    public void setPostprocessorParameters(Properties postprocessorParameters) {
+	this.postprocessorParameters = postprocessorParameters;
     }
 
     @Override
@@ -92,7 +99,8 @@ public abstract class ScenePostprocessor implements GLEventListener {
 	    throw new IllegalArgumentException(exception);
 	}
 
-	postprocessorProgram = createProgram(gl, postprocessorPixelShader);
+	postprocessorProgram = createProgram(gl, postprocessorParameters,
+		postprocessorPixelShader);
 
 	sceneTextureUniformLocation = getUniformLocation(gl,
 		postprocessorProgram, "sceneTexture");

@@ -12,6 +12,7 @@ import static test.GlUtils.loadBGRTexture;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -27,6 +28,8 @@ public class SceneRenderer implements GLEventListener {
     private boolean textureRectangle = true;
 
     private volatile float rotationAngle;
+
+    private Properties effectParameters = new Properties();
 
     private Integer windowPositionUniformLocation;
 
@@ -64,6 +67,10 @@ public class SceneRenderer implements GLEventListener {
 	this.rotationAngle = rotationAngle;
     }
 
+    public void setEffectParameters(Properties effectParameters) {
+	this.effectParameters = effectParameters;
+    }
+
     @Override
     public void init(GLAutoDrawable drawable) {
 	final GL2 gl = useDebugGl(drawable, debugGl);
@@ -88,7 +95,7 @@ public class SceneRenderer implements GLEventListener {
 	    throw new RuntimeException(exception);
 	}
 
-	effectProgram = createProgram(gl, effectPixelShader);
+	effectProgram = createProgram(gl, effectParameters, effectPixelShader);
 
 	windowPositionUniformLocation = getUniformLocation(gl, effectProgram,
 		"windowPosition");
