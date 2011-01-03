@@ -3,19 +3,19 @@ uniform vec2 windowPosition;
 uniform vec2 windowSize;
 uniform float rotationAngle;
 
-const float SPOT_RADIAL_DISTANCE = 0.28;
-const float SPOT_FOCUS_FACTOR = 10.;
-const float SPOT_GLOW_FACTOR = 25.;
+uniform float spotRadialDistance = 0.28;
+uniform float spotFocusFactor = 10.;
+uniform float spotGlowFactor = 25.;
 
 void main() {
 	/* better calculate in Java? */ 
 	float angleRadians = radians(-rotationAngle);
-	vec2 spotPosition = SPOT_RADIAL_DISTANCE * vec2(cos(angleRadians), sin(angleRadians));
+	vec2 spotPosition = spotRadialDistance * vec2(cos(angleRadians), sin(angleRadians));
 
 	vec2 fragmentPosition = 2. * (vec2(gl_FragCoord) - windowPosition) / windowSize - 1.;
 
-	float spotGlow = 1. + SPOT_GLOW_FACTOR * (1. - min(
-		SPOT_FOCUS_FACTOR * distance(fragmentPosition, spotPosition), 
+	float spotGlow = 1. + spotGlowFactor * (1. - min(
+		spotFocusFactor * distance(fragmentPosition, spotPosition), 
 		1.));
 	gl_FragColor = spotGlow * texture2D${Rect}(texture, vec2(gl_TexCoord[0]));
 }
