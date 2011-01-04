@@ -10,7 +10,8 @@ import static test.GlUtils.useDebugGl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -36,7 +37,7 @@ public abstract class ScenePostprocessor implements GLEventListener {
 
     private String postprocessor;
 
-    private Properties postprocessorParameters = new Properties();
+    private Map<String, Object> postprocessorParameters = new HashMap<String, Object>();
 
     private Integer sceneTextureUniformLocation;
 
@@ -64,7 +65,8 @@ public abstract class ScenePostprocessor implements GLEventListener {
 	this.postprocessor = postprocessor;
     }
 
-    public void setPostprocessorParameters(Properties postprocessorParameters) {
+    public void setPostprocessorParameters(
+	    Map<String, Object> postprocessorParameters) {
 	this.postprocessorParameters = postprocessorParameters;
     }
 

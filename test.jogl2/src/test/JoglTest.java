@@ -9,6 +9,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,9 +29,11 @@ public class JoglTest {
 
     private String effect = "spotglow";
 
+    private Map<String, Object> effectParameters = new HashMap<String, Object>();
+
     private String image = "cover";
 
-    private String[] postprocessors = {};
+    private LinkedHashMap<String, Map<String, Object>> postprocessors = new LinkedHashMap<String, Map<String, Object>>();
 
     private boolean pbuffer;
 
@@ -72,11 +78,27 @@ public class JoglTest {
 		if (optionLowCase.matches("d(ebug)?")) {
 		    debugGl = true;
 		} else if (optionLowCase.matches("e(ffect)?")) {
-		    effect = value;
+		    if (value == null) {
+			throw new IllegalArgumentException(
+				"effect name not specified");
+		    }
+
+		    NameWithParameters effectWithParameters = NameWithParameters
+			    .parse(value);
+		    effect = effectWithParameters.getName();
+		    effectParameters = effectWithParameters.getParameters();
 		} else if (optionLowCase.matches("i(mage)?")) {
 		    image = value;
-		} else if (optionLowCase.matches("(p|pp|((post)?processors))")) {
-		    postprocessors = value.split(",");
+		} else if (optionLowCase.matches("(p|pp|((post)?processor))")) {
+		    if (value == null) {
+			throw new IllegalArgumentException(
+				"postprocessor name not specified");
+		    }
+
+		    NameWithParameters postprocessorWithParameters = NameWithParameters
+			    .parse(value);
+		    postprocessors.put(postprocessorWithParameters.getName(),
+			    postprocessorWithParameters.getParameters());
 		} else if (optionLowCase.matches("pbuffer")) {
 		    pbuffer = true;
 		} else if (optionLowCase
@@ -144,14 +166,16 @@ public class JoglTest {
 	sceneRenderer = new SceneRenderer();
 	sceneRenderer.setDebugGl(debugGl);
 	sceneRenderer.setEffect(effect);
+	sceneRenderer.setEffectParameters(effectParameters);
 	sceneRenderer.setImage(image);
 	sceneRenderer.setTextureRectangle(textureRectangle);
 	sceneRenderer.setRotationAngle(0);
 
 	GLEventListener actualRenderer = sceneRenderer;
-	for (String postprocessorName : postprocessors) {
-	    actualRenderer = createScenePostprocessor(postprocessorName,
-		    actualRenderer);
+	for (Entry<String, Map<String, Object>> postprocessorEntry : postprocessors
+		.entrySet()) {
+	    actualRenderer = createScenePostprocessor(postprocessorEntry
+		    .getKey(), actualRenderer, postprocessorEntry.getValue());
 	}
 
 	view.addGLEventListener(actualRenderer);
@@ -168,11 +192,13 @@ public class JoglTest {
     }
 
     private ScenePostprocessor createScenePostprocessor(
-	    String postprocessorName, GLEventListener actualRenderer) {
+	    String postprocessorName, GLEventListener actualRenderer,
+	    Map<String, Object> postprocessorParameters) {
 	ScenePostprocessor scenePostprocessor = pbuffer ? new PbufferScenePostprocessor()
 		: new FboScenePostprocessor();
 	scenePostprocessor.setSceneRenderer(actualRenderer);
 	scenePostprocessor.setPostprocessor(postprocessorName);
+	scenePostprocessor.setPostprocessorParameters(postprocessorParameters);
 	scenePostprocessor.setDebugGl(debugGl);
 	scenePostprocessor.setTextureRectangle(textureRectangle);
 	scenePostprocessor.setHdr(hdr);
@@ -220,6 +246,67 @@ public class JoglTest {
 
 		sceneRenderer.setRotationAngle(rotationAngle);
 		view.repaint();
+	    }
+	}
+    }
+
+    private static class NameWithParameters {
+	private static final Pattern SPECIFICATION_PATTERN = Pattern
+		.compile("(.*?)(?:\\((.*)\\))?");
+
+	private static final Pattern PAIR_PATTERN = Pattern
+		.compile("(.+)[\\:=](.+)");
+
+	private final String name;
+
+	private final Map<String, Object> parameters;
+
+	static NameWithParameters parse(String specification) {
+	    Matcher specificationMatcher = SPECIFICATION_PATTERN
+		    .matcher(specification);
+	    specificationMatcher.matches();
+
+	    String name = specificationMatcher.group(1);
+
+	    Map<String, Object> parameters = new HashMap<String, Object>();
+	    if (specificationMatcher.groupCount() > 1) {
+		String parameterString = specificationMatcher.group(2);
+		if (parameterString != null) {
+		    for (String pair : parameterString.split("[;,]")) {
+			Matcher pairMatcher = PAIR_PATTERN.matcher(pair);
+			if (pairMatcher.matches()) {
+			    parameters.put(pairMatcher.group(1),
+				    parseValue(pairMatcher.group(2)));
+			} else {
+			    throw new IllegalArgumentException(
+				    "illegal parameter specification for "
+					    + name);
+			}
+		    }
+		}
+	    }
+
+	    return new NameWithParameters(name, parameters);
+	}
+
+	private NameWithParameters(String name, Map<String, Object> parameters) {
+	    this.name = name;
+	    this.parameters = parameters;
+	}
+
+	String getName() {
+	    return name;
+	}
+
+	Map<String, Object> getParameters() {
+	    return parameters;
+	}
+
+	private static Object parseValue(String value) {
+	    if (value.contains(".")) {
+		return Float.parseFloat(value);
+	    } else {
+		return Integer.parseInt(value);
 	    }
 	}
     }

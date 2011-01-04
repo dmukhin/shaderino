@@ -6,13 +6,14 @@ import static test.GlUtils.createTexture;
 import static test.GlUtils.deleteTextures;
 import static test.GlUtils.getGl2;
 import static test.GlUtils.getUniformLocation;
-import static test.GlUtils.useDebugGl;
 import static test.GlUtils.loadBGRTexture;
+import static test.GlUtils.useDebugGl;
 
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -29,7 +30,7 @@ public class SceneRenderer implements GLEventListener {
 
     private volatile float rotationAngle;
 
-    private Properties effectParameters = new Properties();
+    private Map<String, Object> effectParameters = new HashMap<String, Object>();
 
     private Integer windowPositionUniformLocation;
 
@@ -67,7 +68,7 @@ public class SceneRenderer implements GLEventListener {
 	this.rotationAngle = rotationAngle;
     }
 
-    public void setEffectParameters(Properties effectParameters) {
+    public void setEffectParameters(Map<String, Object> effectParameters) {
 	this.effectParameters = effectParameters;
     }
 

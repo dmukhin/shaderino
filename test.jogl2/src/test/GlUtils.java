@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
@@ -31,8 +31,8 @@ public abstract class GlUtils {
 	return drawable.getGL().getGL2();
     }
 
-    public static int createProgram(final GL2 gl, Properties parameters,
-	    int... pixelShaders) {
+    public static int createProgram(final GL2 gl,
+	    Map<String, Object> parameters, int... pixelShaders) {
 	final int program = gl.glCreateProgram();
 
 	for (int pixelShader : pixelShaders) {
@@ -54,15 +54,26 @@ public abstract class GlUtils {
 	    throw new RuntimeException("program not linked, from log: " + info);
 	}
 
-	for (Entry<Object, Object> entry : parameters.entrySet()) {
-	    Integer parameterLocation = getUniformLocation(gl, program,
-		    (String) entry.getKey());
+	gl.glUseProgram(program);
+	
+	for (Entry<String, Object> entry : parameters.entrySet()) {
+	    Integer parameterLocation = getUniformLocation(gl, program, entry
+		    .getKey());
 	    if (parameterLocation != null) {
-		String value = (String) entry.getValue();
-		if (value.contains(".")) {
-		    gl.glUniform1f(parameterLocation, Float.parseFloat(value));
+		Object value = entry.getValue();
+		if (value instanceof Number) {
+		    Number numberValue = (Number) value;
+		    if (value instanceof Float || value instanceof Double) {
+			gl.glUniform1f(parameterLocation, numberValue
+				.floatValue());
+		    } else {
+			gl.glUniform1i(parameterLocation, numberValue
+				.intValue());
+		    }
 		} else {
-		    gl.glUniform1i(parameterLocation, Integer.parseInt(value));
+		    throw new IllegalArgumentException("invalid parameter "
+			    + entry.getKey() + " type "
+			    + value.getClass().getName());
 		}
 	    } else {
 		throw new IllegalArgumentException(
