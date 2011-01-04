@@ -91,12 +91,15 @@ public class SceneRenderer implements GLEventListener {
 
 	try {
 	    effectPixelShader = createShader(gl, shaderTemplateSource,
-		    textureRectangle);
+		    textureRectangle, (debugGl ? "effect " + effect
+			    + " shader compilation log: " : null));
 	} catch (IOException exception) {
 	    throw new RuntimeException(exception);
 	}
 
-	effectProgram = createProgram(gl, effectParameters, effectPixelShader);
+	effectProgram = createProgram(gl, effectParameters,
+		(debugGl ? "effect " + effect + " shader program linking log: "
+			: null), effectPixelShader);
 
 	windowPositionUniformLocation = getUniformLocation(gl, effectProgram,
 		"windowPosition");

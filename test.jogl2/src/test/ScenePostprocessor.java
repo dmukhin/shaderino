@@ -96,12 +96,16 @@ public abstract class ScenePostprocessor implements GLEventListener {
 
 	try {
 	    postprocessorPixelShader = createShader(gl, shaderTemplateSource,
-		    textureRectangle);
+		    textureRectangle, (debugGl ? "postprocessor "
+			    + postprocessor + " shader compilation log: "
+			    : null));
 	} catch (IOException exception) {
 	    throw new IllegalArgumentException(exception);
 	}
 
 	postprocessorProgram = createProgram(gl, postprocessorParameters,
+		(debugGl ? "postprocessor " + postprocessor
+			+ " shader program linking log: " : null),
 		postprocessorPixelShader);
 
 	sceneTextureUniformLocation = getUniformLocation(gl,

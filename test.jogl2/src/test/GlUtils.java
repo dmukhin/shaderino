@@ -32,7 +32,8 @@ public abstract class GlUtils {
     }
 
     public static int createProgram(final GL2 gl,
-	    Map<String, Object> parameters, int... pixelShaders) {
+	    Map<String, Object> parameters, String logMessagePrefix,
+	    int... pixelShaders) {
 	final int program = gl.glCreateProgram();
 
 	for (int pixelShader : pixelShaders) {
@@ -43,7 +44,7 @@ public abstract class GlUtils {
 
 	int[] programStatus = new int[1];
 	gl.glGetProgramiv(program, GL2.GL_LINK_STATUS, programStatus, 0);
-	if (GL2.GL_TRUE != programStatus[0]) {
+	if (GL2.GL_TRUE != programStatus[0] || logMessagePrefix != null) {
 	    String info = getInfoLog(new GetInfoLogAction() {
 		@Override
 		public void doGetInfoLog(byte[] buffer, int[] length) {
@@ -51,11 +52,17 @@ public abstract class GlUtils {
 			    buffer, 0);
 		}
 	    });
-	    throw new RuntimeException("program not linked, from log: " + info);
+
+	    if (GL2.GL_TRUE != programStatus[0]) {
+		throw new RuntimeException("program not linked, from log: "
+			+ info);
+	    } else {
+		System.out.println(logMessagePrefix + info);
+	    }
 	}
 
 	gl.glUseProgram(program);
-	
+
 	for (Entry<String, Object> entry : parameters.entrySet()) {
 	    Integer parameterLocation = getUniformLocation(gl, program, entry
 		    .getKey());
@@ -85,7 +92,8 @@ public abstract class GlUtils {
     }
 
     public static int createShader(final GL2 gl, InputStream templateSource,
-	    boolean textureRectangle) throws IOException {
+	    boolean textureRectangle, String logMessagePrefix)
+	    throws IOException {
 	ArrayList<String> lines = new ArrayList<String>();
 	BufferedReader reader = new BufferedReader(new InputStreamReader(
 		templateSource, "ASCII"));
@@ -116,7 +124,7 @@ public abstract class GlUtils {
 
 	int[] shaderStatus = new int[1];
 	gl.glGetShaderiv(shader, GL2.GL_COMPILE_STATUS, shaderStatus, 0);
-	if (GL2.GL_TRUE != shaderStatus[0]) {
+	if (GL2.GL_TRUE != shaderStatus[0] || logMessagePrefix != null) {
 	    String info = getInfoLog(new GetInfoLogAction() {
 		@Override
 		public void doGetInfoLog(byte[] buffer, int[] length) {
@@ -124,7 +132,13 @@ public abstract class GlUtils {
 			    buffer, 0);
 		}
 	    });
-	    throw new RuntimeException("shader not compiled, from log: " + info);
+
+	    if (GL2.GL_TRUE != shaderStatus[0]) {
+		throw new RuntimeException("shader not compiled, from log: "
+			+ info);
+	    } else {
+		System.out.println(logMessagePrefix + info);
+	    }
 	}
 
 	return shader;
