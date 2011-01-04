@@ -1,3 +1,5 @@
+- analyze shader compilation warning: 'global type sampler2DRect / global function texture2DRect requires "#extension GL_ARB_texture_rectangle : enable" before use'
+- analyze shader compilation warning: 'OpenGL does not allow initialization of uniform variables'
 - on Radeon 2600XT process doesn't exit
 - didn't see GLPbuffer RTT work yet
 - check again the problem with corruption (using FBO postprocessing): appeared on Intel GMA 4500, multi-monitor configuration, usually on secondary display; fixed by unbinding framebuffer, but it seems normally not required action 
