@@ -27,7 +27,7 @@ public class JoglTest {
 
     private boolean debugGl;
 
-    private String effect = "spotglow";
+    private String effect = "spot";
 
     private Map<String, Object> effectParameters = new HashMap<String, Object>();
 
