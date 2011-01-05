@@ -1,0 +1,42 @@
+uniform sampler2D${Rect} sceneTexture;
+uniform vec2 sceneTextureSize;
+uniform vec2 sceneTextureMaxCoord;
+
+uniform float bloomThreshold = 1.25;
+uniform int bloomRadius = 1;
+uniform float maxBloomFactor = 1.;
+uniform float minBloomFactor = 0.5;
+
+void main() {
+	vec2 baseCoordinates = gl_TexCoord[0].st;
+	vec4 baseColor = texture2D${Rect}(sceneTexture, baseCoordinates);
+
+	vec2 pixelSize = sceneTextureMaxCoord / sceneTextureSize;
+	vec3 accumulatedColor = vec3(baseColor);
+	for (int y = bloomRadius; y >= -bloomRadius; y--) {
+		int maxX = int(sqrt(float(bloomRadius * bloomRadius - y * y)));
+		for (int x = -maxX; x <= maxX; x++) {
+			if (x != 0 || y != 0) {
+				vec2 pixelCoordinates = vec2(x, y);
+				vec2 coordinates = baseCoordinates 
+					+ pixelCoordinates * pixelSize;
+				if (coordinates.x >= 0. 
+					&& coordinates.y >= 0.
+					&& coordinates.x < sceneTextureMaxCoord.x 
+					&& coordinates.y < sceneTextureMaxCoord.y) { 
+					vec3 color = vec3(texture2D${Rect}(sceneTexture, coordinates));
+					if (length(color) > bloomThreshold) {
+						float weight = maxBloomFactor 
+							- float(maxBloomFactor - minBloomFactor) 
+								* length(pixelCoordinates) 
+								/ float(bloomRadius);
+						accumulatedColor += weight * color;
+					}
+				}
+			}
+		}
+	}
+
+	gl_FragColor.rgb = accumulatedColor;
+	gl_FragColor.a = baseColor.a;
+}
