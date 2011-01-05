@@ -27,6 +27,8 @@ public class JoglTest {
 
     private boolean debugGl;
 
+    private Boolean vsync;
+
     private String effect = "spot";
 
     private Map<String, Object> effectParameters = new HashMap<String, Object>();
@@ -50,6 +52,8 @@ public class JoglTest {
     private GLCanvas view;
 
     private SceneRenderer sceneRenderer;
+
+    private GLEventListener actualRenderer;
 
     private volatile boolean closing;
 
@@ -77,6 +81,15 @@ public class JoglTest {
 			: null;
 		if (optionLowCase.matches("d(ebug)?")) {
 		    debugGl = true;
+		} else if (optionLowCase.matches("vsync")) {
+		    if (value.equalsIgnoreCase("on")) {
+			vsync = true;
+		    } else if (value.equalsIgnoreCase("off")) {
+			vsync = false;
+		    } else {
+			throw new IllegalArgumentException(
+				"invalid vsync option value");
+		    }
 		} else if (optionLowCase.matches("e(ffect)?")) {
 		    if (value == null) {
 			throw new IllegalArgumentException(
@@ -143,26 +156,6 @@ public class JoglTest {
     private void createView() {
 	view = new GLCanvas();
 
-	view.addGLEventListener(new GLEventListener() {
-	    @Override
-	    public void init(GLAutoDrawable drawable) {
-		printGlInfo(GlUtils.getGl2(drawable));
-	    }
-
-	    @Override
-	    public void reshape(GLAutoDrawable drawable, int x, int y,
-		    int width, int height) {
-	    }
-
-	    @Override
-	    public void display(GLAutoDrawable glautodrawable) {
-	    }
-
-	    @Override
-	    public void dispose(GLAutoDrawable glautodrawable) {
-	    }
-	});
-
 	sceneRenderer = new SceneRenderer();
 	sceneRenderer.setDebugGl(debugGl);
 	sceneRenderer.setEffect(effect);
@@ -171,14 +164,41 @@ public class JoglTest {
 	sceneRenderer.setTextureRectangle(textureRectangle);
 	sceneRenderer.setRotationAngle(0);
 
-	GLEventListener actualRenderer = sceneRenderer;
+	actualRenderer = sceneRenderer;
 	for (Entry<String, Map<String, Object>> postprocessorEntry : postprocessors
 		.entrySet()) {
 	    actualRenderer = createScenePostprocessor(postprocessorEntry
 		    .getKey(), actualRenderer, postprocessorEntry.getValue());
 	}
 
-	view.addGLEventListener(actualRenderer);
+	view.addGLEventListener(new GLEventListener() {
+	    @Override
+	    public void init(GLAutoDrawable drawable) {
+		printGlInfo(GlUtils.getGl2(drawable));
+
+		actualRenderer.init(drawable);
+
+		if (vsync != null) {
+		    GlUtils.getGl2(drawable).setSwapInterval(vsync ? 1 : 0);
+		}
+	    }
+
+	    @Override
+	    public void reshape(GLAutoDrawable drawable, int x, int y,
+		    int width, int height) {
+		actualRenderer.reshape(drawable, x, y, width, height);
+	    }
+
+	    @Override
+	    public void display(GLAutoDrawable drawable) {
+		actualRenderer.display(drawable);
+	    }
+
+	    @Override
+	    public void dispose(GLAutoDrawable drawable) {
+		actualRenderer.dispose(drawable);
+	    }
+	});
 
 	windowClientArea.addComponentListener(new ComponentAdapter() {
 	    @Override
