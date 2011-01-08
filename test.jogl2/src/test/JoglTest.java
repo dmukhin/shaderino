@@ -7,6 +7,8 @@ import java.awt.Frame;
 import java.awt.Panel;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
@@ -28,6 +30,10 @@ public class JoglTest {
     private boolean debugGl;
 
     private Boolean vsync;
+
+    private int maxFps = 100;
+
+    private int animationSpeed = 50;
 
     private String effect = "spot";
 
@@ -56,6 +62,8 @@ public class JoglTest {
     private GLEventListener actualRenderer;
 
     private volatile boolean closing;
+
+    private volatile boolean paused;
 
     public static void main(String[] args) throws Exception {
 	JoglTest test = new JoglTest();
@@ -90,6 +98,10 @@ public class JoglTest {
 			throw new IllegalArgumentException(
 				"invalid vsync option value");
 		    }
+		} else if (optionLowCase.matches("max\\-fps")) {
+		    maxFps = Integer.parseInt(value);
+		} else if (optionLowCase.matches("(animation\\-)speed")) {
+		    animationSpeed = Integer.parseInt(value);
 		} else if (optionLowCase.matches("e(ffect)?")) {
 		    if (value == null) {
 			throw new IllegalArgumentException(
@@ -115,7 +127,7 @@ public class JoglTest {
 		} else if (optionLowCase.matches("pbuffer")) {
 		    pbuffer = true;
 		} else if (optionLowCase
-			.matches("pbuffer-(rtt|render\\-to\\-texture)")) {
+			.matches("pbuffer\\-(rtt|render\\-to\\-texture)")) {
 		    pbuffer = true;
 		    pbufferRenderToTexture = true;
 		} else if (optionLowCase.matches("hdr|high\\-dynamic\\-range")) {
@@ -142,6 +154,15 @@ public class JoglTest {
 	windowClientArea.setBackground(Color.BLACK);
 	windowClientArea.setLayout(null);
 	window.add(windowClientArea);
+
+	window.addKeyListener(new KeyAdapter() {
+	    @Override
+	    public void keyPressed(KeyEvent event) {
+		if (event.getKeyCode() == KeyEvent.VK_PAUSE) {
+		    paused = !paused;
+		}
+	    }
+	});
 
 	window.addWindowListener(new WindowAdapter() {
 	    @Override
@@ -249,24 +270,33 @@ public class JoglTest {
     private void animate() {
 	closing = false;
 
-	int rotationAngle = 0;
 	window.setVisible(true);
 
+	long animationPeriod = 1000l * 1000 * 1000 / maxFps;
+	long animationPeriodMillis = animationPeriod / (1000 * 1000);
+	int animationPeriodNanos = (int) (animationPeriod % (1000 * 1000));
+
+	float rotationAngle = 0;
+	float rotationAngleDelta = animationPeriod * animationSpeed / 1e9f;
 	while (!closing) {
+	    boolean wasPaused = paused;
 	    try {
-		Thread.sleep(1000 / 50);
+		Thread.sleep(animationPeriodMillis, animationPeriodNanos);
 	    } catch (InterruptedException exception) {
 	    }
 
 	    if (!closing) {
-		rotationAngle++;
-		if (rotationAngle >= 180) {
-		    rotationAngle = -180;
-		}
+		if (!paused && !wasPaused) {
+		    rotationAngle += rotationAngleDelta;
+		    if (rotationAngle >= 180) {
+			rotationAngle = rotationAngle - 360;
+		    }
 
-		sceneRenderer.setRotationAngle(rotationAngle);
-		view.repaint();
+		    sceneRenderer.setRotationAngle(rotationAngle);
+		}
 	    }
+
+	    view.repaint();
 	}
     }
 
