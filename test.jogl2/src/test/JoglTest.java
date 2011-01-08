@@ -5,12 +5,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Panel;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -69,6 +72,8 @@ public class JoglTest {
 
     private volatile boolean paused;
 
+    private boolean fullscreen;
+
     public static void main(String[] args) throws Exception {
 	JoglTest test = new JoglTest();
 	test.processArgs(args);
@@ -93,6 +98,8 @@ public class JoglTest {
 			: null;
 		if (optionLowCase.matches("d(ebug)?")) {
 		    debugGl = true;
+		} else if (optionLowCase.matches("fullscreen")) {
+		    fullscreen = true;
 		} else if (optionLowCase.matches("vsync")) {
 		    if (value.equalsIgnoreCase("on")) {
 			vsync = true;
@@ -159,6 +166,28 @@ public class JoglTest {
 	window.setSize(400, 400);
 	window.setLayout(new BorderLayout());
 
+	if (fullscreen) {
+	    window.setUndecorated(true);
+
+	    window.setExtendedState(Frame.MAXIMIZED_BOTH);
+
+	    window.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
+		    new BufferedImage(1, 1, BufferedImage.TRANSLUCENT),
+		    new Point(0, 0), "InvisibleCursor"));
+
+	    // get rid of problem appears in Windows:
+	    // if started in fullscreen, then Win key pressed, then appeared
+	    // Windows menu hidden by mouse click out of menu, then Alt-Tab,
+	    // then Alt-Tab back - since that it causes no non-system keys
+	    // handled
+	    window.addWindowListener(new WindowAdapter() {
+		@Override
+		public void windowActivated(WindowEvent vent) {
+		    window.requestFocus();
+		}
+	    });
+	}
+
 	windowClientArea = new Panel();
 	windowClientArea.setBackground(Color.BLACK);
 	windowClientArea.setLayout(null);
@@ -167,8 +196,13 @@ public class JoglTest {
 	window.addKeyListener(new KeyAdapter() {
 	    @Override
 	    public void keyPressed(KeyEvent event) {
-		if (event.getKeyCode() == KeyEvent.VK_PAUSE) {
+		switch (event.getKeyCode()) {
+		case KeyEvent.VK_ESCAPE:
+		    closeWindow();
+		    break;
+		case KeyEvent.VK_PAUSE:
 		    paused = !paused;
+		    break;
 		}
 	    }
 	});
@@ -176,11 +210,15 @@ public class JoglTest {
 	window.addWindowListener(new WindowAdapter() {
 	    @Override
 	    public void windowClosing(WindowEvent event) {
-		closing = true;
-
-		event.getWindow().dispose();
+		closeWindow();
 	    }
 	});
+    }
+
+    private void closeWindow() {
+	closing = true;
+
+	window.dispose();
     }
 
     private void createView() {
