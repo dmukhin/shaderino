@@ -35,6 +35,10 @@ public class JoglTest {
 
     private int animationSpeed = 50;
 
+    private boolean showFps;
+
+    private int showFpsPeriod = 10000;
+
     private String effect = "spot";
 
     private Map<String, Object> effectParameters = new HashMap<String, Object>();
@@ -102,6 +106,11 @@ public class JoglTest {
 		    maxFps = Integer.parseInt(value);
 		} else if (optionLowCase.matches("(animation\\-)speed")) {
 		    animationSpeed = Integer.parseInt(value);
+		} else if (optionLowCase.matches("show\\-fps")) {
+		    showFps = true;
+		    if (value != null) {
+			showFpsPeriod = Integer.parseInt(value) * 1000;
+		    }
 		} else if (optionLowCase.matches("e(ffect)?")) {
 		    if (value == null) {
 			throw new IllegalArgumentException(
@@ -193,9 +202,15 @@ public class JoglTest {
 	}
 
 	view.addGLEventListener(new GLEventListener() {
+	    private long fpsMeasureStartTime;
+
+	    private int frameCount;
+
 	    @Override
 	    public void init(GLAutoDrawable drawable) {
 		printGlInfo(GlUtils.getGl2(drawable));
+
+		restartFpsMeasure();
 
 		actualRenderer.init(drawable);
 
@@ -213,11 +228,34 @@ public class JoglTest {
 	    @Override
 	    public void display(GLAutoDrawable drawable) {
 		actualRenderer.display(drawable);
+
+		if (showFps) {
+		    frameCount++;
+
+		    if (System.currentTimeMillis() - fpsMeasureStartTime >= showFpsPeriod) {
+			showFps();
+
+			restartFpsMeasure();
+		    }
+		}
 	    }
 
 	    @Override
 	    public void dispose(GLAutoDrawable drawable) {
 		actualRenderer.dispose(drawable);
+	    }
+
+	    private void restartFpsMeasure() {
+		if (showFps) {
+		    fpsMeasureStartTime = System.currentTimeMillis();
+		    frameCount = 0;
+		}
+	    }
+
+	    private void showFps() {
+		System.out.format("FPS was %.1f in last %d seconds\n",
+			((double) frameCount) * 1000 / showFpsPeriod,
+			showFpsPeriod / 1000);
 	    }
 	});
 
