@@ -8,12 +8,11 @@ import static test.GlUtils.getGl2;
 import static test.GlUtils.getUniformLocation;
 import static test.GlUtils.loadBGRTexture;
 import static test.GlUtils.useDebugGl;
+import static test.JavaUtils.loadProperties;
 
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -30,7 +29,7 @@ public class SceneRenderer implements GLEventListener {
 
     private volatile float rotationAngle;
 
-    private Map<String, Object> effectParameters = new HashMap<String, Object>();
+    private UniformParameters effectParameters = new UniformParameters();
 
     private Integer windowPositionUniformLocation;
 
@@ -68,7 +67,7 @@ public class SceneRenderer implements GLEventListener {
 	this.rotationAngle = rotationAngle;
     }
 
-    public void setEffectParameters(Map<String, Object> effectParameters) {
+    public void setEffectParameters(UniformParameters effectParameters) {
 	this.effectParameters = effectParameters;
     }
 
@@ -93,13 +92,17 @@ public class SceneRenderer implements GLEventListener {
 	    effectPixelShader = createShader(gl, shaderTemplateSource,
 		    textureRectangle, (debugGl ? "effect " + effect
 			    + " shader compilation log: " : null));
+
+	    effectProgram = createProgram(gl, new UniformParameters(
+		    effectParameters, loadProperties(JoglTest.class
+			    .getResourceAsStream("effects/" + effect
+				    + ".properties"))).getValues(),
+		    (debugGl ? "effect " + effect
+			    + " shader program linking log: " : null),
+		    effectPixelShader);
 	} catch (IOException exception) {
 	    throw new RuntimeException(exception);
 	}
-
-	effectProgram = createProgram(gl, effectParameters,
-		(debugGl ? "effect " + effect + " shader program linking log: "
-			: null), effectPixelShader);
 
 	windowPositionUniformLocation = getUniformLocation(gl, effectProgram,
 		"windowPosition");

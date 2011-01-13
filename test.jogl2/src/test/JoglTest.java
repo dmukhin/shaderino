@@ -14,9 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,11 +42,11 @@ public class JoglTest {
 
     private String effect = "spot";
 
-    private Map<String, Object> effectParameters = new HashMap<String, Object>();
+    private UniformParameters effectParameters = new UniformParameters();
 
     private String image = "cover";
 
-    private LinkedHashMap<String, Map<String, Object>> postprocessors = new LinkedHashMap<String, Map<String, Object>>();
+    private LinkedHashMap<String, UniformParameters> postprocessors = new LinkedHashMap<String, UniformParameters>();
 
     private boolean pbuffer;
 
@@ -233,7 +231,7 @@ public class JoglTest {
 	sceneRenderer.setRotationAngle(0);
 
 	actualRenderer = sceneRenderer;
-	for (Entry<String, Map<String, Object>> postprocessorEntry : postprocessors
+	for (Entry<String, UniformParameters> postprocessorEntry : postprocessors
 		.entrySet()) {
 	    actualRenderer = createScenePostprocessor(postprocessorEntry
 		    .getKey(), actualRenderer, postprocessorEntry.getValue());
@@ -310,7 +308,7 @@ public class JoglTest {
 
     private ScenePostprocessor createScenePostprocessor(
 	    String postprocessorName, GLEventListener actualRenderer,
-	    Map<String, Object> postprocessorParameters) {
+	    UniformParameters postprocessorParameters) {
 	ScenePostprocessor scenePostprocessor = pbuffer ? new PbufferScenePostprocessor()
 		: new FboScenePostprocessor();
 	scenePostprocessor.setSceneRenderer(actualRenderer);
@@ -385,7 +383,7 @@ public class JoglTest {
 
 	private final String name;
 
-	private final Map<String, Object> parameters;
+	private final UniformParameters parameters;
 
 	static NameWithParameters parse(String specification) {
 	    Matcher specificationMatcher = SPECIFICATION_PATTERN
@@ -394,15 +392,15 @@ public class JoglTest {
 
 	    String name = specificationMatcher.group(1);
 
-	    Map<String, Object> parameters = new HashMap<String, Object>();
+	    UniformParameters parameters = new UniformParameters();
 	    if (specificationMatcher.groupCount() > 1) {
 		String parameterString = specificationMatcher.group(2);
 		if (parameterString != null) {
 		    for (String pair : parameterString.split("[;,]")) {
 			Matcher pairMatcher = PAIR_PATTERN.matcher(pair);
 			if (pairMatcher.matches()) {
-			    parameters.put(pairMatcher.group(1),
-				    parseValue(pairMatcher.group(2)));
+			    parameters.setParameter(pairMatcher.group(1),
+				    pairMatcher.group(2));
 			} else {
 			    throw new IllegalArgumentException(
 				    "illegal parameter specification for "
@@ -415,7 +413,7 @@ public class JoglTest {
 	    return new NameWithParameters(name, parameters);
 	}
 
-	private NameWithParameters(String name, Map<String, Object> parameters) {
+	private NameWithParameters(String name, UniformParameters parameters) {
 	    this.name = name;
 	    this.parameters = parameters;
 	}
@@ -424,16 +422,8 @@ public class JoglTest {
 	    return name;
 	}
 
-	Map<String, Object> getParameters() {
+	UniformParameters getParameters() {
 	    return parameters;
-	}
-
-	private static Object parseValue(String value) {
-	    if (value.contains(".")) {
-		return Float.parseFloat(value);
-	    } else {
-		return Integer.parseInt(value);
-	    }
 	}
     }
 }

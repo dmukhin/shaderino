@@ -7,11 +7,10 @@ import static test.GlUtils.deleteTextures;
 import static test.GlUtils.getGl2;
 import static test.GlUtils.getUniformLocation;
 import static test.GlUtils.useDebugGl;
+import static test.JavaUtils.loadProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -37,7 +36,7 @@ public abstract class ScenePostprocessor implements GLEventListener {
 
     private String postprocessor;
 
-    private Map<String, Object> postprocessorParameters = new HashMap<String, Object>();
+    private UniformParameters postprocessorParameters = new UniformParameters();
 
     private Integer sceneTextureUniformLocation;
 
@@ -66,7 +65,7 @@ public abstract class ScenePostprocessor implements GLEventListener {
     }
 
     public void setPostprocessorParameters(
-	    Map<String, Object> postprocessorParameters) {
+	    UniformParameters postprocessorParameters) {
 	this.postprocessorParameters = postprocessorParameters;
     }
 
@@ -99,14 +98,17 @@ public abstract class ScenePostprocessor implements GLEventListener {
 		    textureRectangle, (debugGl ? "postprocessor "
 			    + postprocessor + " shader compilation log: "
 			    : null));
+
+	    postprocessorProgram = createProgram(gl, new UniformParameters(
+		    postprocessorParameters, loadProperties(JoglTest.class
+			    .getResourceAsStream("postprocessors/"
+				    + postprocessor + ".properties")))
+		    .getValues(), (debugGl ? "postprocessor " + postprocessor
+		    + " shader program linking log: " : null),
+		    postprocessorPixelShader);
 	} catch (IOException exception) {
 	    throw new IllegalArgumentException(exception);
 	}
-
-	postprocessorProgram = createProgram(gl, postprocessorParameters,
-		(debugGl ? "postprocessor " + postprocessor
-			+ " shader program linking log: " : null),
-		postprocessorPixelShader);
 
 	sceneTextureUniformLocation = getUniformLocation(gl,
 		postprocessorProgram, "sceneTexture");

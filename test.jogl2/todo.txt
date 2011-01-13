@@ -1,9 +1,7 @@
-- change implementation of effect/shader parameter default initialization: 
-  uniform initialization in shader causes Intel GMA 4500 doesn't run 
-  application, on Nvidia ION shader compilation warning appears: 'OpenGL does 
-  not allow initialization of uniform variables' 
 - on Radeon 2600XT process doesn't exit (perhaps wrong drivers - Catalyst 
   10.11?)
+- anomally high refresh reates on Intel GMA 4500 (VSync doesn't work? also 
+  should check on other systems)
 - shader compilation warning on Nvidia ION: 'global type sampler2DRect / global 
   function texture2DRect requires "#extension GL_ARB_texture_rectangle : 
   enable" before use'

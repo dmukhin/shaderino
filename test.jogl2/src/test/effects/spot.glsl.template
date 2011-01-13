@@ -3,13 +3,13 @@ uniform vec2 windowPosition;
 uniform vec2 windowSize;
 uniform float rotationAngle;
 
-uniform int spotSpeed = 5;
-uniform float spotInitialAngle = 0.;
-uniform float spotMaxDistance = 0.6;
-uniform float spotColorRed = 1.;
-uniform float spotColorGreen = 1.;
-uniform float spotColorBlue = 1.;
-uniform float spotFocusFactor = 10.;
+uniform int spotSpeed;
+uniform float spotInitialAngle;
+uniform float spotMaxDistance;
+uniform float spotColorRed;
+uniform float spotColorGreen;
+uniform float spotColorBlue;
+uniform float spotFocusFactor;
 
 void main() {
 	float spotAngleRadians = radians(-float(spotSpeed) * rotationAngle + spotInitialAngle);

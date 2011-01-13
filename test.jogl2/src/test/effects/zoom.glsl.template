@@ -2,7 +2,7 @@ uniform sampler2D${Rect} texture;
 uniform vec2 textureMaxCoord;
 uniform float rotationAngle;
 
-uniform float maxZoomFactor = 2.9;
+uniform float maxZoomFactor;
 
 void main() {
 	float zoom = 1. + (maxZoomFactor - 1.) * abs(rotationAngle) / 180.;

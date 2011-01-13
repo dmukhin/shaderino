@@ -2,10 +2,10 @@ uniform sampler2D${Rect} sceneTexture;
 uniform vec2 sceneTextureSize;
 uniform vec2 sceneTextureMaxCoord;
 
-uniform float bloomThreshold = 1.25;
-uniform int bloomRadius = 1;
-uniform float maxBloomFactor = 1.;
-uniform float minBloomFactor = 0.5;
+uniform float bloomThreshold;
+uniform int bloomRadius;
+uniform float maxBloomFactor;
+uniform float minBloomFactor;
 
 void main() {
 	vec2 baseCoordinates = gl_TexCoord[0].st;
