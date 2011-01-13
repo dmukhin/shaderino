@@ -4,7 +4,7 @@
   should check on other systems)
 - shader compilation warning on Nvidia ION: 'global type sampler2DRect / global 
   function texture2DRect requires "#extension GL_ARB_texture_rectangle : 
-  enable" before use'
+  enable" before use' (FIXED BUT NOT CHECKED)
 - on Nvidia ION there is strange tiling effect when vertex comes to window top 
   (cured only with VSync off)
 - didn't see GLPbuffer RTT work yet

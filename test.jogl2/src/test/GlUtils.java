@@ -95,6 +95,11 @@ public abstract class GlUtils {
 	    boolean textureRectangle, String logMessagePrefix)
 	    throws IOException {
 	ArrayList<String> lines = new ArrayList<String>();
+
+	if (textureRectangle) {
+	    lines.add("#extension GL_ARB_texture_rectangle : enable\n");
+	}
+
 	BufferedReader reader = new BufferedReader(new InputStreamReader(
 		templateSource, "ASCII"));
 	try {
@@ -103,7 +108,8 @@ public abstract class GlUtils {
 		line = reader.readLine();
 		if (line != null) {
 		    lines.add(line.replaceAll("\\$\\{Rect\\}",
-			    textureRectangle ? "Rect" : ""));
+			    textureRectangle ? "Rect" : "")
+			    + "\n");
 		}
 	    } while (line != null);
 	} finally {
