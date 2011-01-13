@@ -173,15 +173,26 @@ public class JoglTest {
 		    new BufferedImage(1, 1, BufferedImage.TRANSLUCENT),
 		    new Point(0, 0), "InvisibleCursor"));
 
-	    // get rid of problem appears in Windows:
-	    // if started in fullscreen, then Win key pressed, then appeared
-	    // Windows menu hidden by mouse click out of menu, then Alt-Tab,
-	    // then Alt-Tab back - since that it causes no non-system keys
-	    // handled
 	    window.addWindowListener(new WindowAdapter() {
 		@Override
-		public void windowActivated(WindowEvent vent) {
+		public void windowActivated(WindowEvent event) {
+		    if (fullscreen) {
+			window.setExtendedState(Frame.MAXIMIZED_BOTH);
+		    }
+
+		    // get rid of problem appears in Windows:
+		    // if started in fullscreen, then Win key pressed, then
+		    // appeared Windows menu hidden by mouse click out of menu,
+		    // then Alt-Tab, then Alt-Tab back - since that it causes no
+		    // non-system keys handled
 		    window.requestFocus();
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent event) {
+		    if (fullscreen) {
+			window.setExtendedState(Frame.ICONIFIED);
+		    }
 		}
 	    });
 	}
