@@ -1,9 +1,19 @@
-- analyze shader compilation warning: 'global type sampler2DRect / global function texture2DRect requires "#extension GL_ARB_texture_rectangle : enable" before use'
-- analyze shader compilation warning: 'OpenGL does not allow initialization of uniform variables'
-- on Radeon 2600XT process doesn't exit
-- on Nvidia ION there is strange tiling effect when vertex comes to window top (cured only with VSync off)
+- change implementation of effect/shader parameter default initialization: 
+  uniform initialization in shader causes Intel GMA 4500 doesn't run 
+  application, on Nvidia ION shader compilation warning appears: 'OpenGL does 
+  not allow initialization of uniform variables' 
+- on Radeon 2600XT process doesn't exit (perhaps wrong drivers - Catalyst 
+  10.11?)
+- shader compilation warning on Nvidia ION: 'global type sampler2DRect / global 
+  function texture2DRect requires "#extension GL_ARB_texture_rectangle : 
+  enable" before use'
+- on Nvidia ION there is strange tiling effect when vertex comes to window top 
+  (cured only with VSync off)
 - didn't see GLPbuffer RTT work yet
-- check again the problem with corruption (using FBO postprocessing): appeared on Intel GMA 4500, multi-monitor configuration, usually on secondary display; fixed by unbinding framebuffer, but it seems normally not required action 
-- dig more about problems appears after context destruction when shared context is current (workaround works but need to discover)
+- check again the problem with corruption (using FBO postprocessing): appeared 
+  on Intel GMA 4500, multi-monitor configuration, usually on secondary display; 
+  fixed by unbinding framebuffer, but it seems normally should not be required 
+  action 
+- dig more about problems appears after context destruction when shared context 
+  is current (workaround works but need to discover)
 - implement error handling which doesn't cause process not exit
- 
