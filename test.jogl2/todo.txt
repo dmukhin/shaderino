@@ -1,10 +1,7 @@
 - on Radeon 2600XT process doesn't exit (perhaps wrong drivers - Catalyst 
   10.11?)
-- anomally high refresh reates on Intel GMA 4500 (VSync doesn't work? also 
+- anomally high refresh rates on Intel GMA 4500 (VSync doesn't work? also 
   should check on other systems)
-- shader compilation warning on Nvidia ION: 'global type sampler2DRect / global 
-  function texture2DRect requires "#extension GL_ARB_texture_rectangle : 
-  enable" before use' (FIXED BUT NOT CHECKED)
 - on Nvidia ION there is strange tiling effect when vertex comes to window top 
   (cured only with VSync off)
 - didn't see GLPbuffer RTT work yet
