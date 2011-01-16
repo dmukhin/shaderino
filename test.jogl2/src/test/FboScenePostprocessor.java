@@ -119,7 +119,7 @@ public class FboScenePostprocessor extends ScenePostprocessor {
 	getGl2(drawable).glBindFramebuffer(GL2.GL_FRAMEBUFFER, framebuffer);
     }
 
-    // if framebuffer is not unbound in renderSceneTexture after scene processed
+    // if framebuffer is not unbound in renderSceneTexture after processed
     // scene rendered, it leads to corruption (appeared on Intel GMA 4500 with
     // multi-monitor configuration, usually on secondary monitor)
     private void unbindFramebuffer(GLAutoDrawable drawable) {
