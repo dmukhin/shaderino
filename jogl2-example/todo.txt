@@ -4,7 +4,6 @@
   should check on other systems)
 - on Nvidia ION there is strange tiling effect when vertex comes to window top 
   (cured only with VSync off)
-- didn't see GLPbuffer RTT work yet
 - check again the problem with corruption (using FBO postprocessing): appeared 
   on Intel GMA 4500, multi-monitor configuration, usually on secondary display; 
   fixed by unbinding framebuffer, but it seems normally should not be required 
